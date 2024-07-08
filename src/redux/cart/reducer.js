@@ -1,18 +1,38 @@
-import CartActionTypes from "./action-types"
+import CartActionTypes from "./action-types";
 
 const initialState = {
-    products: [],
-    productsTotalPrice: 0
-}
- const cartReducer = (state = initialState, action) => {
-    switch (action.type) {
-        case CartActionTypes.ADD_PRODUCT:
-            return {...initialState,
-                products: [...initialState.products, action.payload],
-            }
-        default:
-            return state;
-    }
- } 
+  products: [],
+  productsTotalPrice: 0,
+};
 
- export default cartReducer
+const cartReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case CartActionTypes.ADD_PRODUCT:
+      // verificar se o produto já está no carrinho
+      const productIsAlredyInCart = state.products.some(
+        (product) => product.id === action.payload.id
+      );
+
+      // se ele estiver, aumentar a quantidade em
+      if (productIsAlredyInCart) {
+        return {
+          ...state,
+          products: state.products.map((product) =>
+            product.id === action.payload.id
+              ? { ...product, quantity: product.quantity + 1 }
+              : product
+          ),
+        };
+      }
+
+      // se ele não estiver, adiciona-lo
+      return {
+        ...state,
+        products: [...state.products, { ...action.payload, quantity: 1 }],
+      };
+
+    default:
+      return state;
+  }
+};
+export default cartReducer;
